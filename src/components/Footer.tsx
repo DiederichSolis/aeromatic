@@ -10,46 +10,22 @@ function cn(...c: Array<string | false | null | undefined>) {
 
 export default function Footer() {
   const pathname = usePathname();
-
   const items = [
-    { href: "/stats",   label: "Estadísticas", icon: BarChart3 },
-    { href: "/home",    label: "Inicio",        icon: Home },
-    { href: "/ajustes", label: "Ajustes",       icon: Settings },
+    { href: "/stats", label: "Estadísticas", icon: BarChart3 },
+    { href: "/home",  label: "Inicio",        icon: Home },
+    { href: "/ajustes", label: "Ajustes",     icon: Settings },
   ];
 
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-50 bg-[url('/background.png')]">
-    <div className="absolute inset-0 bg-black/20" />
-      <nav
-        className="
-          mx-auto max-w-screen-md
-          bg-transparent
-          border-t border-black/10
-          px-10
-          py-4 md:py-5
-          pb-[calc(18px+env(safe-area-inset-bottom))]
-        "
-        aria-label="Navegación inferior"
-      >
-        <ul className="flex items-center justify-between gap-10">
+    <footer className="fixed inset-x-0 bottom-0 z-50 bg-[#bee2e4]">
+      <nav className="mx-auto max-w-screen-md bg-transparent border-t border-black/10 px-8 py-3 pb-[calc(14px+env(safe-area-inset-bottom))]">
+        <ul className="flex items-center justify-between gap-8">
           {items.map(({ href, label, icon: Icon }) => {
             const active = pathname?.startsWith(href);
             return (
               <li key={href}>
-                <Link
-                  href={href}
-                  aria-label={label}
-                  className={cn(
-                    "group inline-flex flex-col items-center",
-                    active && "scale-105"
-                  )}
-                >
-                  <Icon
-                   className="h-10 w-10 md:h-12 md:w-12 text-black"  
-                    strokeWidth={3}
-                  />
-                  {/* Si quieres texto, descomenta: */}
-                  {/* <span className="mt-1 text-xs opacity-80">{label}</span> */}
+                <Link href={href} aria-label={label} className={cn("group inline-flex flex-col items-center", active && "scale-105")}>
+                  <Icon className="h-7 w-7 md:h-8 md:w-8 text-black" strokeWidth={2.75} />
                 </Link>
               </li>
             );
