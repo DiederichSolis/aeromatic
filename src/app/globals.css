@@ -1,26 +1,23 @@
 @import "tailwindcss";
-@import "@ionic/react/css/core.css";
-@import "@ionic/react/css/normalize.css";
-@import "@ionic/react/css/structure.css";
-@import "@ionic/react/css/typography.css";
-@import "@ionic/react/css/padding.css";
-@import "@ionic/react/css/float-elements.css";
-@import "@ionic/react/css/text-alignment.css";
-@import "@ionic/react/css/text-transformation.css";
-@import "@ionic/react/css/flex-utils.css";
-@import "@ionic/react/css/display.css";
 
+@theme {
+  /* Fuente por defecto del proyecto */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Fuente para títulos (usaremos la clase font-display) */
+  --font-display: var(--font-outfit), var(--font-sans);
+}
+
+/* (opcional) Ajustes finos */
+h1, h2, .font-display { font-family: var(--font-display); }
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -28,7 +25,6 @@
     --foreground: #ededed;
   }
 }
-
 body {
   background: var(--background);
   color: var(--foreground);

@@ -1,28 +1,25 @@
 "use client";
 
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
-} from "@ionic/react";
+import RoomsTabs from "@/components/RoomsTabs";
 
 export default function HomePage() {
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>APP Aeromatic</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+    <section className="relative min-h-[calc(100dvh-80px)]">
+      <div className="absolute inset-0 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat" />
+     <div className="absolute inset-0 bg-black/20" />
 
-      <IonContent className="p-6">
-        <h1 className="text-2xl font-semibold mb-4">Hola 👋</h1>
-        <p className="mb-4">Next.js + Ionic + Tailwind funcionando.</p>
-        <IonButton expand="block">Botón Ionic</IonButton>
-      </IonContent>
-    </IonPage>
+
+      {/* chips arriba, CENTRADOS */}
+      <div className="relative z-10 mx-auto max-w-5xl px-6 pt-6">
+        <div className="w-full flex justify-center">
+          <RoomsTabs
+            items={["Habitación", "Sala de estar", "Oficina"]}
+            onAdd={() => console.log("Agregar ambiente")}
+          />
+        </div>
+      </div>
+
+      {/* resto del contenido */}
+    </section>
   );
 }
