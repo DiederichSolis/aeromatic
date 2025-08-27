@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">aeromatic</string>
+    <string name="title_activity_main">aeromatic</string>
+    <string name="package_name">com.app.aeromatic</string>
+    <string name="custom_url_scheme">com.app.aeromatic</string>
+</resources>
