@@ -43,7 +43,7 @@ export default function OutdoorPanel({
       </div>
 
       {/* Controles */}
-      <div className="mt-0 md:mt-20 flex flex-col items-center gap-5">
+      <div className="mt-0 md:mt-6 flex flex-col items-center gap-5">
         {/* Auto */}
         <button
           onClick={() => setAuto(v => !v)}
