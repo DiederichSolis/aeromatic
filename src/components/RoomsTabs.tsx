@@ -14,13 +14,14 @@ export default function RoomsTabs({ items, onAdd }: Props) {
   const railRef = useRef<HTMLDivElement | null>(null);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Asegura que el activo quede visible al cambiar
+
   useEffect(() => {
     const el = btnRefs.current[active];
     el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }, [active]);
 
-  // Desplazar con mouse wheel horizontal (útil en desktop)
+ 
+  
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;

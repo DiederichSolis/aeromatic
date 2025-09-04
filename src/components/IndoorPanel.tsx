@@ -5,26 +5,38 @@ import { Wifi, Plus, Thermometer, Droplets } from "lucide-react";
 
 type Size = "sm" | "md" | "lg";
 
-const circleSize: Record<Size, string> = {
-  sm: "w-48 h-48",
-  md: "w-64 h-64",
-  lg: "w-80 h-80",
+
+const circleBase: Record<Size, string> = {
+  sm: "w-32 h-32",   
+  md: "w-45 h-50",   
+  lg: "w-40 h-40",   
 };
-const imgWidth: Record<Size, string> = {
-  sm: "w-[65%]",
-  md: "w-[70%]",
-  lg: "w-[78%]",
+
+const circleMdUp: Record<Size, string> = {
+  sm: "md:w-48 md:h-48",
+  md: "md:w-64 md:h-64",
+  lg: "md:w-80 md:h-80",
+};
+
+const imgBase: Record<Size, string> = {
+  sm: "w-[52%]",  
+  md: "w-[62%]",
+  lg: "w-[58%]",
+};
+const imgMdUp: Record<Size, string> = {
+  sm: "md:w-[65%]",
+  md: "md:w-[70%]",
+  lg: "md:w-[78%]",
 };
 
 type Props = {
   titulo: string;
   ventanaSrc?: string;
-  size?: Size;
+  size?: Size;          
   onAdd?: () => void;
-
-  headerLabel?: string;  // "Interior"
-  tempC?: number;        // 24
-  humidity?: number;     // 50
+  headerLabel?: string;
+  tempC?: number;
+  humidity?: number;
 };
 
 export default function IndoorPanel({
@@ -38,48 +50,59 @@ export default function IndoorPanel({
 }: Props) {
   return (
     <div className="flex flex-col items-center text-white">
-      {/* === CARD GRIS: Interior + lecturas === */}
-      <div className="mb-6 md:mb-8">
-        <div
+      {/* Header gris */}
+ {/* Header gris */}
+ <div className="mb-3 md:mb-6 -mt-10 sm:-mt-7 md:-mt-2">
+ <div
           className="
-            flex flex-col items-center gap-2
+            flex flex-col items-center gap-1.5 md:gap-2
             rounded-2xl bg-neutral-700/70 text-white
-            px-4 py-3 md:px-5 md:py-3.5
+            px-4 py-2.5 md:px-5 md:py-3.5
             shadow-lg ring-1 ring-white/15 backdrop-blur-sm
           "
         >
-          <span className="text-lg md:text-xl font-bold tracking-tight">
-            {headerLabel}
-          </span>
-          <div className="flex items-center gap-5 text-base md:text-lg">
-            <span className="flex items-center gap-1.5">
-              <Thermometer className="h-5 w-5 md:h-6 md:w-6" strokeWidth={3} /> {tempC}°C
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Droplets className="h-5 w-5 md:h-6 md:w-6" strokeWidth={3} /> {humidity}%
-            </span>
-          </div>
-        </div>
-      </div>
+    {/* 🔹título +1 paso en móvil */}
+    <span className="text-base md:text-xl font-bold tracking-tight">
+      {headerLabel}
+    </span>
 
-      {/* Título del bloque (Habtación) con espacio extra */}
-      <div className="mb-6 md:mb-7 text-2xl md:text-3xl font-extrabold tracking-tight">
+    {/* 🔹lecturas +1 paso en móvil */}
+    <div className="flex items-center gap-4 md:gap-6 text-sm md:text-lg">
+      <span className="inline-flex items-center gap-1.5">
+        <Thermometer className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} /> {tempC}°C
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <Droplets className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} /> {humidity}%
+      </span>
+    </div>
+  </div>
+</div>
+
+
+      {/* Título */}
+      <div className="mt-10 mb-4 md:mb-6 text-lg md:text-3xl font-extrabold tracking-tight">
         {titulo}
       </div>
 
       {/* Círculo + ventana */}
       <div
         className={[
+          "mt-12",
           "relative grid place-items-center rounded-full",
           "bg-gradient-to-br from-cyan-700/40 via-cyan-600/30 to-cyan-400/30",
           "ring-1 ring-white/30 shadow-[inset_0_18px_60px_rgba(0,0,0,0.25)]",
-          circleSize[size],
+          circleBase[size],
+          circleMdUp[size],
         ].join(" ")}
       >
-        {/* Badge Wi-Fi (mismo estilo que antes) */}
-        <div className="absolute -top-3 md:-top-4 left-1/2 -translate-x-1/2 grid h-12 w-12 place-items-center rounded-full bg-slate-800/90 border border-slate-700/60 shadow-lg">
-          <Wifi className="h-6 w-6 text-white" strokeWidth={2.5} />
+        {/* Wifi badge */}
+        <div className="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 grid
+                h-12 w-12 md:h-14 md:w-14
+                place-items-center rounded-full bg-slate-800/90
+                border-2 border-slate-700/60 shadow-xl">
+          <Wifi className="h-6 w-6 md:h-7 md:w-7 text-white" strokeWidth={2.6} />
         </div>
+
 
         <Image
           src={ventanaSrc}
@@ -87,21 +110,20 @@ export default function IndoorPanel({
           width={600}
           height={600}
           priority
-          className={`${imgWidth[size]} h-auto drop-shadow-2xl`}
+          className={`${imgBase[size]} ${imgMdUp[size]} h-auto drop-shadow-2xl`}
         />
       </div>
 
-      {/* Badge + */}
-      <button
-        onClick={onAdd}
-        aria-label="Agregar ventana"
-        className="mt-5 grid h-12 w-12 place-items-center rounded-full bg-slate-800/90 text-white
-                   border border-slate-700/60 shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200"
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.5} />
+      {/* + y etiqueta */}
+      <button className="mt-4 md:mt-6 grid
+                   h-12 w-12 md:h-14 md:w-14
+                   place-items-center rounded-full bg-slate-800/90 text-white
+                   border-2 border-slate-700/60 shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-200">
+        <Plus className="h-6 w-6 md:h-7 md:w-7" strokeWidth={2.6} />
       </button>
 
-      <div className="mt-2 text-base text-white/90">Ventana 1</div>
+
+      <div className="mt-1 md:mt-2 text-xs md:text-base text-white/90">Ventana 1</div>
     </div>
   );
 }
