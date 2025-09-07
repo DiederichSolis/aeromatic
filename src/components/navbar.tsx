@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Menu, Bell } from "lucide-react";
-
+import Link from "next/link"; 
 type Props = { logoSrc?: string; avatarSrc?: string };
 
 export default function Navbar({
@@ -36,14 +36,16 @@ export default function Navbar({
 
         {/* Derecha */}
         <div className="relative z-20 flex items-center">
+        <Link href="/account" aria-label="Cuenta">
           <Image
             src={avatarSrc}
             alt="Perfil"
             width={40}
             height={40}
-            className="h-8 w-8 rounded-full object-cover ring-2 ring-black/10 shadow"
+            className="h-8 w-8 rounded-full object-cover ring-2 ring-black/10 shadow hover:scale-105 transition"
           />
-        </div>
+        </Link>
+      </div>
       </div>
     </header>
   );

@@ -7,21 +7,28 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
-type Props = { items: string[]; onAdd?: () => void };
+type Props = {
+  items: string[];
+  onAdd?: () => void;
+  active?: number;                          // controlado
+  onChangeActive?: (index: number) => void; // callback al padre
+};
 
-export default function RoomsTabs({ items, onAdd }: Props) {
-  const [active, setActive] = useState(0);
+export default function RoomsTabs({ items, onAdd, active, onChangeActive }: Props) {
+  // Soporta modo controlado/no controlado
+  const isControlled = typeof active === "number";
+  const [innerActive, setInnerActive] = useState(0);
+  const currActive = isControlled ? (active as number) : innerActive;
+  const setActive = (i: number) => (isControlled ? onChangeActive?.(i) : setInnerActive(i));
+
   const railRef = useRef<HTMLDivElement | null>(null);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-
   useEffect(() => {
-    const el = btnRefs.current[active];
+    const el = btnRefs.current[currActive];
     el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }, [active]);
+  }, [currActive]);
 
- 
-  
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;
@@ -38,7 +45,7 @@ export default function RoomsTabs({ items, onAdd }: Props) {
 
   return (
     <div className="flex items-center gap-3 md:gap-4">
-      {/* Flecha izquierda (solo en md+) */}
+      {/* Flecha izquierda (md+) */}
       <button
         type="button"
         onClick={() => scrollBy(-220)}
@@ -49,9 +56,8 @@ export default function RoomsTabs({ items, onAdd }: Props) {
         <ChevronLeft className="h-5 w-5 text-slate-700" />
       </button>
 
-      {/* Carril deslizable */}
+      {/* Carril */}
       <div className="relative max-w-full">
-        {/* fades laterales sutiles */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white/40 to-transparent rounded-l-full" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-white/40 to-transparent rounded-r-full" />
 
@@ -69,20 +75,18 @@ export default function RoomsTabs({ items, onAdd }: Props) {
           style={{ WebkitOverflowScrolling: "touch" as any }}
         >
           {items.map((label, i) => {
-            const activeTab = i === active;
+            const activeTab = i === currActive;
             return (
               <button
                 key={label}
-                ref={(el: HTMLButtonElement | null) => {
-                  btnRefs.current[i] = el;
-                }}
+                ref={(el: HTMLButtonElement | null) => { btnRefs.current[i] = el; }}
                 role="tab"
                 aria-selected={activeTab}
                 tabIndex={activeTab ? 0 : -1}
                 onClick={() => setActive(i)}
                 onKeyDown={(e) => {
-                  if (e.key === "ArrowRight") setActive((v) => Math.min(v + 1, items.length - 1));
-                  if (e.key === "ArrowLeft") setActive((v) => Math.max(v - 1, 0));
+                  if (e.key === "ArrowRight") setActive(Math.min(currActive + 1, items.length - 1));
+                  if (e.key === "ArrowLeft") setActive(Math.max(currActive - 1, 0));
                 }}
                 className={cx(
                   "snap-start whitespace-nowrap rounded-full transition-all duration-200 outline-none",
@@ -100,7 +104,7 @@ export default function RoomsTabs({ items, onAdd }: Props) {
         </div>
       </div>
 
-      {/* Flecha derecha (solo en md+) */}
+      {/* Flecha derecha (md+) */}
       <button
         type="button"
         onClick={() => scrollBy(220)}
@@ -111,9 +115,8 @@ export default function RoomsTabs({ items, onAdd }: Props) {
         <ChevronRight className="h-5 w-5 text-slate-700" />
       </button>
 
-
-       {/* Botón + */}
-       <button
+      {/* Botón + (nuevo espacio) */}
+      <button
         onClick={onAdd}
         aria-label="Agregar ambiente"
         className="grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full bg-white/90
