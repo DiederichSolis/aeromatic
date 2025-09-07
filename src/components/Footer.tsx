@@ -12,7 +12,7 @@ export default function Footer() {
   const pathname = usePathname();
   const items = [
     { href: "/stats", label: "Estadísticas", icon: BarChart3 },
-    { href: "/home",  label: "Inicio",        icon: Home },
+    { href: "/",  label: "Inicio", icon: Home },
     { href: "/ajustes", label: "Ajustes",     icon: Settings },
   ];
 
