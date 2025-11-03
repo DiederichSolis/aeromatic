@@ -12,7 +12,6 @@ import {
   Legend,
 } from "recharts";
 
-type Mode = "daily" | "monthly";
 
 const dailySample = [
   { label: "12 Feb", views: 65, unique: 96, returns: 213 },
@@ -38,7 +37,7 @@ function StatCard({ title, value, diff }: { title: string; value: string; diff: 
   
 
 export default function StatsPage() {
-  const [mode, setMode] = useState<Mode>("daily");
+    const [mode, setMode] = useState<"daily" | "monthly">("daily");
 
   const chartData = useMemo(() => {
     return mode === "daily" ? dailySample : monthlySample;
@@ -51,19 +50,23 @@ export default function StatsPage() {
       <h1 className="text-xl font-bold text-black">Analíticas</h1>
         <div className="mt-4 inline-flex bg-[#eef7ff] rounded-full p-1">
         <button
+        onClick={() => setMode("daily")}   // 👈 usar setMode aquí
         className={`px-4 py-1 rounded-full text-sm font-semibold ${
             mode === "daily" ? "bg-[#bee2e4] text-black" : "text-gray-500"
         }`}
         >
         Diario
         </button>
+
         <button
+        onClick={() => setMode("monthly")} // 👈 usar setMode aquí
         className={`px-4 py-1 rounded-full text-sm font-semibold ${
             mode === "monthly" ? "bg-[#bee2e4] text-black" : "text-gray-500"
         }`}
         >
         Mensual
         </button>
+
         </div>
       </div>
 

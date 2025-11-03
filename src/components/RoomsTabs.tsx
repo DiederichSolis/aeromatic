@@ -72,14 +72,16 @@ export default function RoomsTabs({ items, onAdd, active, onChangeActive }: Prop
             rounded-full border border-white/40 bg-white/20 backdrop-blur-sm
             max-w-[min(100vw-120px,900px)]
           `}
-          style={{ WebkitOverflowScrolling: "touch" as any }}
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {items.map((label, i) => {
             const activeTab = i === currActive;
             return (
               <button
                 key={label}
-                ref={(el: HTMLButtonElement | null) => { btnRefs.current[i] = el; }}
+                ref={(el: HTMLButtonElement | null) => {
+                  btnRefs.current[i] = el;
+                }}
                 role="tab"
                 aria-selected={activeTab}
                 tabIndex={activeTab ? 0 : -1}

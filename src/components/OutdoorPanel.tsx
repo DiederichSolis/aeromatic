@@ -19,7 +19,7 @@ export default function OutdoorPanel({
   return (
     <div className="flex flex-col items-center text-white">
       {/* CARD gris (texto un poco más grande en móvil) */}
-      <div className="mb-20 md:mb-20 -mt-10 sm:-mt-7 md:-mt-2">
+      <div className="mt-6 mb-12">
         <div
           className="
             flex flex-col items-center gap-1.5 md:gap-2
@@ -46,7 +46,7 @@ export default function OutdoorPanel({
       </div>
 
       {/* Controles (más compactos en móvil, igual en md+) */}
-      <div className="mt-25 md:mt-10 flex flex-col items-center gap-3.5 md:gap-5">
+      <div className="mt-22 md:mt-10 flex flex-col items-center gap-3.5 md:gap-5">
         {/* Auto */}
         <button
           type="button"

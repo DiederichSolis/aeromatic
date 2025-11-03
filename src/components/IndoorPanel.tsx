@@ -50,7 +50,7 @@ export default function IndoorPanel({
   return (
     <div className="flex flex-col items-center text-white">
       {/* Header gris */}
-      <div className="mb-3 md:mb-6 -mt-10 sm:-mt-7 md:-mt-2">
+      <div className="mt-6 mb-12">
         <div
           className="
             flex flex-col items-center gap-1.5 md:gap-2
@@ -74,21 +74,21 @@ export default function IndoorPanel({
       </div>
 
       {/* Título del espacio */}
-      <div className="mt-10 mb-4 md:mb-6 text-lg md:text-3xl font-extrabold tracking-tight">
-        {titulo}
-      </div>
+      <div className="mt-0 mb-3 md:mb-4 text-lg md:text-3xl font-extrabold tracking-tight">
+      {titulo}
+    </div>
 
       {/* Círculo + ventana */}
       <div
-        className={[
-          "mt-12",
-          "relative grid place-items-center rounded-full",
-          "bg-gradient-to-br from-cyan-700/40 via-cyan-600/30 to-cyan-400/30",
-          "ring-1 ring-white/30 shadow-[inset_0_18px_60px_rgba(0,0,0,0.25)]",
-          circleBase[size],
-          circleMdUp[size],
-        ].join(" ")}
-      >
+  className={[
+    "mt-6 md:mt-8", // antes: mt-12
+    "relative grid place-items-center rounded-full",
+    "bg-gradient-to-br from-cyan-700/40 via-cyan-600/30 to-cyan-400/30",
+    "ring-1 ring-white/30 shadow-[inset_0_18px_60px_rgba(0,0,0,0.25)]",
+    circleBase[size],
+    circleMdUp[size],
+  ].join(" ")}
+>
         {/* Wifi badge */}
         <div className="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 grid
                 h-12 w-12 md:h-14 md:w-14
