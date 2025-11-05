@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/navbar";
 import { Outfit, Manrope } from "next/font/google";
-import Footer  from "@/components/Footer";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -26,13 +24,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${outfit.variable} ${manrope.variable}`}>
-           <body className="min-h-dvh bg-white text-black">
-        <Navbar />
-        {/* deja suficiente espacio para el footer grande */}
-        <main className="pb-[calc(120px+env(safe-area-inset-bottom))]">
-          {children}
-        </main>
-        <Footer />
+      <body className="min-h-dvh bg-white text-black">
+        {children}
       </body>
     </html>
   );

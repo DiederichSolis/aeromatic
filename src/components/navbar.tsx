@@ -36,7 +36,7 @@ export default function Navbar({
 
         {/* Derecha */}
         <div className="relative z-20 flex items-center">
-        <Link href="/account" aria-label="Cuenta">
+        <Link href="/home/account" aria-label="Cuenta">
           <Image
             src={avatarSrc}
             alt="Perfil"
