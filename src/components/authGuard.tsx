@@ -7,49 +7,32 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-
-  // 1) chequeo inmediato en cliente: ¿hay algo en localStorage?
-  const [authorized, setAuthorized] = useState<null | boolean>(() => {
-    if (typeof window === "undefined") return null; // en server no sabemos
-    const raw = localStorage.getItem("sb_session");
-    return raw ? true : null; // si hay, mostramos de una
-  });
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const verify = async () => {
-   
+    const check = async () => {
       const { data } = await supabase.auth.getSession();
-
       if (!data.session) {
-        setAuthorized(false);
         router.replace("/");
-        return;
+      } else {
+        // opcional
+        localStorage.setItem("sb_session", JSON.stringify(data.session));
       }
-
-      // refrescar el localStorage
-      localStorage.setItem("sb_session", JSON.stringify(data.session));
-      setAuthorized(true);
+      setReady(true);
     };
+    check();
+  }, [router]);
 
-    if (authorized === null) {
-      verify();
-    } else {
-      verify();
-    }
-  }, [authorized, router]);
-
-  if (authorized === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-slate-500">
-        Verificando sesión...
-      </div>
-    );
-  }
-
-  if (authorized === false) {
-    return <div className="min-h-screen bg-white" />;
-  }
-
-  // authorized === true
-  return <>{children}</>;
+ 
+  return (
+    <div className="min-h-dvh bg-white text-black">
+      {ready ? (
+        children
+      ) : (
+        <div className="min-h-dvh flex items-center justify-center text-slate-500">
+          Verificando sesión...
+        </div>
+      )}
+    </div>
+  );
 }

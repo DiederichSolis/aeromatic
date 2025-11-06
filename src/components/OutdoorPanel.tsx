@@ -36,12 +36,15 @@ export default function OutdoorPanel({
         
           <div className="flex items-center gap-3 md:gap-6 text-sm md:text-lg">
             <span className="inline-flex items-center gap-1.5">
-              <Thermometer className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} /> {tempC}°C
+              <Thermometer className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} />{" "}
+              {tempC?.toFixed(2)}°C
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Droplets className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} /> {humidity}%
+              <Droplets className="h-4 w-4 md:h-6 md:w-6" strokeWidth={3} />{" "}
+              {humidity?.toFixed(2)}%
             </span>
           </div>
+
         </div>
       </div>
 
