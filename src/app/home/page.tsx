@@ -11,6 +11,8 @@ import { useUserSpaces } from "@/lib/useUserSpaces";
 import { useSelectedSpace } from "@/lib/useSelectedSpace";
 import { useSpaceDevices } from "@/lib/useSpaceDevices";
 import { useAddSpace } from "@/lib/useAddSpace";
+import { useAddDevice } from "@/lib/useAddDevice";
+import { useUploadDeviceImage } from "@/lib/useUploadDeviceImage";
 
 type TelemetryRow = {
   id: number;
@@ -38,7 +40,7 @@ export default function HomePage() {
   const { selectedSpaceId, setSelectedSpaceId } = useSelectedSpace(spaces);
 
   // 3) devices de ese espacio
-  const { devices, loading: loadingDevices } = useSpaceDevices(selectedSpaceId);
+  const { devices, loading: loadingDevices ,   refetch: refetchDevices } = useSpaceDevices(selectedSpaceId);
 
   // 4) device seleccionado dentro del espacio
   const [activeDeviceIdx, setActiveDeviceIdx] = useState(0);
@@ -48,6 +50,8 @@ export default function HomePage() {
   const [loadingTelemetry, setLoadingTelemetry] = useState(false);
 
   const { addSpace, loading: loadingAdd } = useAddSpace();
+  const { addDevice, loading: loadingAddDevice, error: addDeviceError } = useAddDevice();
+  const { uploadImage } = useUploadDeviceImage();
 
 
   // 1) revisar sesión rápida
@@ -96,7 +100,6 @@ export default function HomePage() {
     const loadAndSub = async () => {
       setLoadingTelemetry(true);
 
-      // última telemetría
       const { data } = await supabase
         .from("telemetry")
         .select("*")
@@ -106,11 +109,15 @@ export default function HomePage() {
         .maybeSingle();
 
       if (!cancelled) {
-        if (data) setTelemetry(data as TelemetryRow);
+        if (data) {
+          setTelemetry(data as TelemetryRow);
+        } else {
+          // no encontró telemetría
+          setTelemetry(null);
+        }
         setLoadingTelemetry(false);
       }
 
-      // realtime
       channel = supabase
         .channel(`telemetry:device:${selectedDevice.device_id}`)
         .on(
@@ -149,9 +156,27 @@ export default function HomePage() {
     }
   };
 
-  const addDevice = (deviceName: string) => {
-    // aquí luego puedes hacer insert a spaces_has_devices
-    console.log("agregar device al espacio:", deviceName, selectedSpaceId);
+  const handleAddDevice = async ({ name, description, hardware_id, file }: { name: string; description: string; hardware_id:string; file: File | null }) => {
+    const newDevice = await addDevice({ name, description, hardware_id });
+    if (!newDevice) return;
+
+    if (file) {
+      const publicUrl = await uploadImage(newDevice.id, file);
+      if (publicUrl) {
+        await supabase
+          .from("device")
+          .update({ image_url: publicUrl })
+          .eq("id", newDevice.id);
+      }
+    }
+
+    if (selectedSpaceId) {
+      await supabase
+        .from("spaces_has_devices")
+        .insert([{ space_id: selectedSpaceId, device_id: newDevice.id }]);
+    }
+
+    await refetchDevices(selectedSpaceId);
     setOpenDevice(false);
   };
 
@@ -216,7 +241,7 @@ export default function HomePage() {
         <div className="min-h-[calc(100dvh-230px)] flex items-center justify-center">
           <div className="grid grid-cols-2 gap-8 md:gap-12 justify-items-center items-start w-full">
             {/* Izquierda */}
-            <div className="min-w-0 flex flex-col items-center md:items-start">
+            <div  className="min-w-0 flex flex-col items-center md:items-start">
               <IndoorPanel
                 titulo={
                   selectedDevice
@@ -225,7 +250,7 @@ export default function HomePage() {
                     ? "Sin dispositivos"
                     : "Sin espacio"
                 }
-                ventanaSrc="/closeW.png"
+                image={selectedDevice ? selectedDevice.image : undefined}
                 size="md"
                 onAdd={() => setOpenDevice(true)}
                 tempC={interiorTemp}
@@ -285,7 +310,7 @@ export default function HomePage() {
             ? spaces.find((s:any) => s.id === selectedSpaceId)?.name ?? ""
             : ""
         }
-        onAdd={addDevice}
+        onAdd={handleAddDevice}
       />
     </section>
   );

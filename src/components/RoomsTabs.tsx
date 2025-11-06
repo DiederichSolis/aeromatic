@@ -44,7 +44,7 @@ export default function RoomsTabs({ items, onAdd, active, onChangeActive }: Prop
   const scrollBy = (dx: number) => railRef.current?.scrollBy({ left: dx, behavior: "smooth" });
 
   return (
-    <div className="flex items-center gap-3 md:gap-4">
+    <div className="flex items-center ">
       {/* Flecha izquierda (md+) */}
       <button
         type="button"
@@ -70,7 +70,7 @@ export default function RoomsTabs({ items, onAdd, active, onChangeActive }: Prop
             snap-x snap-mandatory touch-pan-x select-none
             px-2 py-2 md:px-3
             rounded-full border border-white/40 bg-white/20 backdrop-blur-sm
-            max-w-[min(100vw-120px,900px)]
+           
           `}
           style={{ WebkitOverflowScrolling: "touch" }}
         >

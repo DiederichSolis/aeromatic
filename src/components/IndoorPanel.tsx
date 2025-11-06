@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Wifi, Plus, Thermometer, Droplets } from "lucide-react";
+import { Plus, Thermometer, Droplets } from "lucide-react";
 
 type Size = "sm" | "md" | "lg";
 
@@ -30,7 +29,7 @@ const imgMdUp: Record<Size, string> = {
 
 type Props = {
   titulo: string;          // nombre del espacio (lo pinta el padre)
-  ventanaSrc?: string;
+  image?: string | null;
   size?: Size;
   onAdd?: () => void;      // handler para abrir modal de nuevo dispositivo
   headerLabel?: string;
@@ -40,7 +39,7 @@ type Props = {
 
 export default function IndoorPanel({
   titulo,
-  ventanaSrc = "/closeW.png",
+  image = "/imagenotfound.png",
   size = "lg",
   onAdd,
   headerLabel = "Interior",
@@ -75,41 +74,35 @@ export default function IndoorPanel({
         </div>
       </div>
 
-      {/* Título del espacio */}
-      <div className="mt-0 mb-3 md:mb-4 text-lg md:text-3xl font-extrabold tracking-tight">
-      {titulo}
-    </div>
 
       {/* Círculo + ventana */}
       <div
-  className={[
-    "mt-6 md:mt-8", // antes: mt-12
-    "relative grid place-items-center rounded-full",
-    "bg-gradient-to-br from-cyan-700/40 via-cyan-600/30 to-cyan-400/30",
-    "ring-1 ring-white/30 shadow-[inset_0_18px_60px_rgba(0,0,0,0.25)]",
-    circleBase[size],
-    circleMdUp[size],
-  ].join(" ")}
->
-        {/* Wifi badge */}
-        <div className="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 grid
-                h-12 w-12 md:h-14 md:w-14
-                place-items-center rounded-full bg-slate-800/90
-                border-2 border-slate-700/60 shadow-xl">
-          <Wifi className="h-6 w-6 md:h-7 md:w-7 text-white" strokeWidth={2.6} />
-        </div>
-
-        <Image
-          src={ventanaSrc}
-          alt="Ventana"
-          width={600}
-          height={600}
-          priority
-          className={`${imgBase[size]} ${imgMdUp[size]} h-auto drop-shadow-2xl`}
-        />
+        className={[
+          
+          "relative grid place-items-center rounded-full",
+          "bg-gradient-to-br from-cyan-700/40 via-cyan-600/30 to-cyan-400/30",
+          "ring-1 ring-white/30 shadow-[inset_0_18px_60px_rgba(0,0,0,0.25)]",
+          circleBase[size],
+          circleMdUp[size],
+        ].join(" ")}
+      >
+        {image ? (
+          <img
+            src={image}
+            alt={titulo}
+            className="h-16 w-16 rounded-xl object-cover"
+          />
+        ) : (
+          <img
+            src={"/imagenotfound.png"}
+            alt={titulo}
+            className="h-16 w-16 rounded-xl object-cover"
+          />
+        )}
       </div>
 
-      {/* Botón + (nuevo dispositivo) */}
+      <div className="mt-1 md:mt-2 text-xs md:text-base text-black/90">{titulo} </div>
+
       <button
         onClick={onAdd}
         className="mt-4 md:mt-6 grid
@@ -121,9 +114,6 @@ export default function IndoorPanel({
       >
         <Plus className="h-6 w-6 md:h-7 md:w-7" strokeWidth={2.6} />
       </button>
-
-      {/* Etiqueta bajo el botón (puedes cambiarla por el último dispositivo agregado si quieres) */}
-      <div className="mt-1 md:mt-2 text-xs md:text-base text-black/90">{titulo} </div>
     </div>
   );
 }
