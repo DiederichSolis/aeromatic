@@ -11,8 +11,8 @@ type Props = {
 
 export default function OutdoorPanel({
   headerLabel = "Exterior",
-  tempC = 20,
-  humidity = 70,
+  tempC = 0,
+  humidity = 0,
 }: Props) {
   const [auto, setAuto] = useState(true);
 

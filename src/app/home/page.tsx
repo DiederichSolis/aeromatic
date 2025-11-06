@@ -7,11 +7,10 @@ import OutdoorPanel from "@/components/OutdoorPanel";
 import AddSpaceModal from "@/components/AddSpaceModal";
 import AddDeviceModal from "@/components/AddDeviceModal";
 import { supabase } from "@/lib/supabaseClient";
-
-type UserDevice = {
-  device_id: string;
-  name: string;
-};
+import { useUserSpaces } from "@/lib/useUserSpaces";
+import { useSelectedSpace } from "@/lib/useSelectedSpace";
+import { useSpaceDevices } from "@/lib/useSpaceDevices";
+import { useAddSpace } from "@/lib/useAddSpace";
 
 type TelemetryRow = {
   id: number;
@@ -29,23 +28,27 @@ type TelemetryRow = {
 };
 
 export default function HomePage() {
-  // auth (por si no estás usando el guard en layout)
+  // auth (por si no metes el guard en layout)
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
-  // devices del usuario (ya no fijos)
-  const [devices, setDevices] = useState<UserDevice[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
+  // 1) SPACES del usuario
+  const { spaces, loading: loadingSpaces, refetch } = useUserSpaces();
 
-  // tab activa
-  const [active, setActive] = useState<number>(0);
+  // 2) espacio seleccionado
+  const { selectedSpaceId, setSelectedSpaceId } = useSelectedSpace(spaces);
 
-  // modales
-  const [openSpace, setOpenSpace] = useState(false);
-  const [openDevice, setOpenDevice] = useState(false);
+  // 3) devices de ese espacio
+  const { devices, loading: loadingDevices } = useSpaceDevices(selectedSpaceId);
 
-  // telemetría del device seleccionado
+  // 4) device seleccionado dentro del espacio
+  const [activeDeviceIdx, setActiveDeviceIdx] = useState(0);
+
+  // 5) telemetría del device seleccionado
   const [telemetry, setTelemetry] = useState<TelemetryRow | null>(null);
   const [loadingTelemetry, setLoadingTelemetry] = useState(false);
+
+  const { addSpace, loading: loadingAdd } = useAddSpace();
+
 
   // 1) revisar sesión rápida
   useEffect(() => {
@@ -66,65 +69,21 @@ export default function HomePage() {
     }
   }, []);
 
-  // 2) traer devices del user en DOS pasos (user_has_device → device)
+  // cuando cambien los devices del espacio (porque cambiaste de space), selecciona el primero
   useEffect(() => {
-    const fetchDevices = async () => {
-      setLoadingDevices(true);
-
-      // user actual
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      if (!user) {
-        setDevices([]);
-        setLoadingDevices(false);
-        return;
-      }
-
-      // primero: relaciones
-      const { data: rels, error: relErr } = await supabase
-        .from("user_has_device")
-        .select("device_id, role")
-        .eq("user_id", user.id);
-
-      if (relErr || !rels || rels.length === 0) {
-        setDevices([]);
-        setLoadingDevices(false);
-        return;
-      }
-
-      const ids = rels.map((r) => r.device_id);
-
-      // segundo: traer info de device SIN join
-      const { data: devs, error: devErr } = await supabase
-        .from("device")
-        .select("id, name")
-        .in("id", ids);
-
-      // merge
-      const merged: UserDevice[] = rels.map((r) => {
-        const match = devs?.find((d) => d.id === r.device_id);
-        return {
-          device_id: r.device_id,
-          name: match?.name ?? r.device_id.slice(0, 6),
-        };
-      });
-
-      setDevices(merged);
-      setLoadingDevices(false);
-
-      // si no hay tab seleccionada, selecciona la primera
-      if (merged.length > 0 && active >= merged.length) {
-        setActive(0);
-      }
-    };
-
-    fetchDevices();
-  }, []); // ← importante: no depende de active
+    if (devices.length > 0) {
+      setActiveDeviceIdx(0);
+    } else {
+      setActiveDeviceIdx(0);
+      setTelemetry(null);
+    }
+  }, [devices]);
 
   // device actualmente seleccionado
-  const selectedDevice = devices[active];
+  const selectedDevice =
+    devices.length > 0 ? devices[activeDeviceIdx] : undefined;
 
-  // 3) suscribirse a la telemetría del device seleccionado
+  // suscribirse a telemetría del device seleccionado
   useEffect(() => {
     if (!selectedDevice) {
       setTelemetry(null);
@@ -177,14 +136,22 @@ export default function HomePage() {
     };
   }, [selectedDevice?.device_id]);
 
-  // 4) modales
-  const addSpace = (name: string) => {
-    console.log("crear espacio/dispositivo con nombre:", name);
-    setOpenSpace(false);
+  // modales
+  const [openSpace, setOpenSpace] = useState(false);
+  const [openDevice, setOpenDevice] = useState(false);
+
+ const handleAddSpace = async (name: string, description: string) => {
+    const newSpace = await addSpace(name, description);
+    if (newSpace) {
+      await refetch();
+      // cierra el modal
+      setOpenSpace(false);
+    }
   };
 
   const addDevice = (deviceName: string) => {
-    console.log("agregar device al espacio actual:", deviceName);
+    // aquí luego puedes hacer insert a spaces_has_devices
+    console.log("agregar device al espacio:", deviceName, selectedSpaceId);
     setOpenDevice(false);
   };
 
@@ -197,16 +164,16 @@ export default function HomePage() {
     return <div className="min-h-screen bg-white">No autorizado</div>;
   }
 
-  // tabs a mostrar
-  const tabItems = loadingDevices
+  // tabs de arriba → SPACES
+  const tabItems = loadingSpaces
     ? ["Cargando..."]
-    : devices.map((d) => d.name);
+    : spaces.map((s:any) => s.name);
 
   // valores a mandar a los paneles
-  const interiorTemp = telemetry?.temp_in ?? 24;
-  const interiorHum = telemetry?.hum_in ?? 50;
-  const exteriorTemp = telemetry?.temp_out ?? 20;
-  const exteriorHum = telemetry?.hum_out ?? 70;
+  const interiorTemp = telemetry?.temp_in ?? 0;
+  const interiorHum = telemetry?.hum_in ?? 0;
+  const exteriorTemp = telemetry?.temp_out ?? 0;
+  const exteriorHum = telemetry?.hum_out ?? 0;
 
   return (
     <section className="relative min-h-[100dvh] text-white">
@@ -225,12 +192,21 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
-      {/* Tabs controladas */}
+      {/* Tabs de espacios */}
       <div className="relative z-10 flex justify-center px-4 pt-5">
         <RoomsTabs
           items={tabItems}
-          active={active}
-          onChangeActive={setActive}
+          active={
+            selectedSpaceId
+              ? spaces.findIndex((s:any) => s.id === selectedSpaceId)
+              : 0
+          }
+          onChangeActive={(idx) => {
+            const space = spaces[idx];
+            if (space) {
+              setSelectedSpaceId(space.id);
+            }
+          }}
           onAdd={() => setOpenSpace(true)}
         />
       </div>
@@ -242,13 +218,42 @@ export default function HomePage() {
             {/* Izquierda */}
             <div className="min-w-0 flex flex-col items-center md:items-start">
               <IndoorPanel
-                titulo={selectedDevice ? selectedDevice.name : "Sin dispositivo"}
+                titulo={
+                  selectedDevice
+                    ? selectedDevice.name
+                    : selectedSpaceId
+                    ? "Sin dispositivos"
+                    : "Sin espacio"
+                }
                 ventanaSrc="/closeW.png"
                 size="md"
                 onAdd={() => setOpenDevice(true)}
                 tempC={interiorTemp}
                 humidity={interiorHum}
               />
+
+              {/* selector de devices dentro del espacio */}
+              {loadingDevices ? (
+                <div className="mt-3 text-white/80 text-sm">
+                  Cargando dispositivos...
+                </div>
+              ) : devices.length > 1 ? (
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  {devices.map((d:any, i:any) => (
+                    <button
+                      key={d.device_id}
+                      onClick={() => setActiveDeviceIdx(i)}
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        i === activeDeviceIdx
+                          ? "bg-white/90 text-slate-900"
+                          : "bg-white/10 text-white/80"
+                      }`}
+                    >
+                      {d.name}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
 
               {loadingTelemetry ? (
                 <div className="mt-3 text-white/80 text-sm">
@@ -265,16 +270,21 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Modales */}
       <AddSpaceModal
         open={openSpace}
         onClose={() => setOpenSpace(false)}
-        onAdd={addSpace}
+        onAdd={handleAddSpace}
       />
 
       <AddDeviceModal
         open={openDevice}
         onClose={() => setOpenDevice(false)}
-        currentSpace={selectedDevice ? selectedDevice.name : ""}
+        currentSpace={
+          selectedSpaceId
+            ? spaces.find((s:any) => s.id === selectedSpaceId)?.name ?? ""
+            : ""
+        }
         onAdd={addDevice}
       />
     </section>

@@ -10,56 +10,96 @@ export default function AddSpaceModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onAdd: (name: string) => void;
+  onAdd: (name: string, description: string) => void;
 }) {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       setName("");
+      setDescription("");
       setError(null);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [open]);
 
   const submit = () => {
-    const v = name.trim();
-    if (!v) {
+    const n = name.trim();
+    const d = description.trim();
+
+    if (!n) {
       setError("Escribe un nombre para el espacio.");
       return;
     }
-    onAdd(v);
+
+    if (!d) {
+      setError("Agrega una breve descripción del espacio.");
+      return;
+    }
+
+    onAdd(n, d);
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center" aria-modal="true" role="dialog">
-      <button className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} aria-label="Cerrar" />
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center"
+      aria-modal="true"
+      role="dialog"
+    >
+      <button
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="Cerrar"
+      />
       <div className="relative w-full md:w-[480px] mx-auto rounded-3xl bg-[#f7fffe] shadow-[0_20px_60px_rgba(0,0,0,0.25)] p-6 md:p-7 border border-white/60">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl md:text-2xl font-bold text-black">Nuevo espacio</h3>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-black/5" aria-label="Cerrar modal">
+          <h3 className="text-xl md:text-2xl font-bold text-black">
+            Nuevo espacio
+          </h3>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 hover:bg-black/5"
+            aria-label="Cerrar modal"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
 
+        {/* Nombre */}
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Nombre de tu nuevo espacio
+          Nombre del nuevo espacio
         </label>
         <input
           ref={inputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ej. Habitación, Estudio, Cocina…"
+          className="w-full rounded-2xl border border-[#b7e5e7] bg-white/80 px-4 py-3 text-black placeholder:text-gray-400 outline-none focus:ring-4 focus:ring-[#bfeef0] focus:border-[#9fe1e4] mb-4"
+        />
+
+        {/* Descripción */}
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Descripción
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Describe brevemente el propósito o ubicación del espacio."
+          rows={3}
           className="w-full rounded-2xl border border-[#b7e5e7] bg-white/80 px-4 py-3 text-black placeholder:text-gray-400 outline-none focus:ring-4 focus:ring-[#bfeef0] focus:border-[#9fe1e4]"
         />
+
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
         <div className="mt-5 rounded-2xl bg-[#e7f6f7] border border-white/60 p-4">
-          <p className="text-sm text-gray-700">*Puedes añadir dispositivos después desde Ajustes.</p>
+          <p className="text-sm text-gray-700">
+            *Podrás añadir dispositivos después desde este espacio.
+          </p>
         </div>
 
         <div className="mt-6 flex justify-center">

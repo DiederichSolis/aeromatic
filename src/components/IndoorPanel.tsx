@@ -44,8 +44,8 @@ export default function IndoorPanel({
   size = "lg",
   onAdd,
   headerLabel = "Interior",
-  tempC = 24,
-  humidity = 50,
+  tempC = 0,
+  humidity = 0,
 }: Props) {
   return (
     <div className="flex flex-col items-center text-white">
@@ -123,7 +123,7 @@ export default function IndoorPanel({
       </button>
 
       {/* Etiqueta bajo el botón (puedes cambiarla por el último dispositivo agregado si quieres) */}
-      <div className="mt-1 md:mt-2 text-xs md:text-base text-white/90">Ventana 1</div>
+      <div className="mt-1 md:mt-2 text-xs md:text-base text-black/90">{titulo} </div>
     </div>
   );
 }
